@@ -3,205 +3,286 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sailor Piece Finder</title>
+<title>Sailor Piece App</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial;
-    background: radial-gradient(circle at top, #0f172a, #020617);
+    background: #020617;
     color: white;
-    padding: 15px;
+    display: flex;
+    height: 100vh;
 }
 
-h1 {
-    text-align: center;
+.sidebar {
+    width: 30%;
+    background: #0f172a;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+h2 {
     color: #38bdf8;
-    text-shadow: 0 0 10px #38bdf8;
+}
+
+.item {
+    padding: 8px;
+    margin: 5px 0;
+    background: #020617;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.item:hover {
+    background: #38bdf8;
 }
 
 .search {
-    text-align: center;
-    margin: 15px 0;
-}
-
-input {
-    width: 90%;
-    max-width: 400px;
+    width: 100%;
     padding: 10px;
-    border-radius: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
     border: none;
-    background: #1e293b;
-    color: white;
-    box-shadow: 0 0 10px #38bdf8;
-}
-
-.container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
 }
 
 .card {
-    background: #020617;
-    border: 1px solid #38bdf8;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 0 10px #0ea5e9;
-}
-
-.card h3 {
-    margin: 0 0 5px;
-    color: #22c55e;
-}
-
-.buttons {
-    text-align: center;
-    margin: 15px 0;
-}
-
-button {
-    padding: 10px;
-    margin: 5px;
-    background: #1e293b;
-    color: white;
-    border: none;
-    border-radius: 6px;
-}
-
-button:hover {
-    background: #38bdf8;
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #38bdf8;
 }
 </style>
 </head>
 
 <body>
 
-<h1>⚔️ Sailor Piece Finder</h1>
+<div class="sidebar">
 
-<div class="search">
-<input type="text" id="search" placeholder="🔎 Buscar material...">
+<input class="search" id="search" placeholder="Buscar material...">
+
+<h2>⚔️ Espadas</h2>
+<div id="swordList"></div>
+
+<h2>👊 Estilos</h2>
+<div id="styleList"></div>
+
 </div>
 
-<div class="buttons">
-<button onclick="move(-1)">⬅️</button>
-<button onclick="move(1)">➡️</button>
+<div class="main">
+<h2>📜 Receta</h2>
+<div id="display" class="card">Selecciona un arma o busca un material</div>
 </div>
-
-<div class="container" id="grid"></div>
 
 <script>
 
-const swords = [
+const database = [
+
 {
-name:"Ice Queen",
-materials:["Ice Core","Frozen Band","Glacier Remnant","Battle Shard","Frost Relic"],
-recipe:`Ice Core x1<br>Frozen Band x4<br>Glacier Remnant x9<br>Battle Shard x17<br>Frost Relic x25`
+type:"sword",
+name:"Rimuru",
+materials:["Sage Pulse","Tempest Seal","Slime Remnant","Slime Core"],
+recipe:`Demon Lord Title<br>30M Money<br>20,000 Gems<br>Sage Pulse x9<br>Tempest Seal x6<br>Slime Remnant x3<br>Slime Core x1`
 },
+
 {
-name:"Shadow Monarch",
-materials:["Monarch Core","Monarch Essence","Kamish Dagger","Shadow Crystal"],
-recipe:`Monarch Core x10<br>Monarch Essence x5<br>Kamish Dagger x2<br>Shadow Crystal x1`
+type:"sword",
+name:"Aizen Sword",
+materials:["Mirage Pendant","Illusion Prism","Reiatsu Core","Ayoku Fragment"],
+recipe:`6M Money<br>10,000 Gems<br>Mirage Pendant x10<br>Illusion Prism x6<br>Reiatsu Core x3<br>Ayoku Fragment x1`
 },
+
 {
-name:"Atomic",
-materials:["Atomic Omen","Eminence Essence","Shadow Remnant","Magic Shard","Abyss Sigil"],
-recipe:`Atomic Omen x1<br>Eminence Essence x3<br>Shadow Remnant x9<br>Magic Shard x16<br>Abyss Sigil x80`
-},
-{
+type:"sword",
 name:"True Aizen",
 materials:["Evolution Fragment","Transcendent Core","Divinity Essence","Fusion Ring","Chrysalis Sigil"],
-recipe:`Evolution Fragment x1<br>Transcendent Core x3<br>Divinity Essence x8<br>Fusion Ring x15<br>Chrysalis Sigil x75`
+recipe:`Transcendent Being Title<br>Aizen Sword<br>Evolution Fragment x1<br>Transcendent Core x3<br>Divinity Essence x8<br>Fusion Ring x15<br>Chrysalis Sigil x75<br>35,000 Gems`
 },
+
 {
+type:"sword",
 name:"Yamato",
 materials:["Azure Heart","Silent Storms","Yamato Essence","Frozen Will"],
-recipe:`Azure Heart x1<br>Silent Storms x3<br>Yamato Essence x7<br>Frozen Will x14`
+recipe:`Blade Sovereign Title<br>Soul Bless Race<br>Azure Heart x1<br>Silent Storms x3<br>Yamato Essence x7<br>Frozen Will x14<br>30,000 Gems`
 },
-{
-name:"Abyssal Empress",
-materials:["Tower Tokens"],
-recipe:`Tower Tokens x4000`
-}
-];
 
-const melee = [
 {
+type:"sword",
+name:"Ragna Sword",
+materials:["Wyrm Brand","Black Forest","Silver Requiem"],
+recipe:`1M Money<br>4,500 Gems<br>Wyrm Brand x7<br>Black Forest x3<br>Silver Requiem x1`
+},
+
+{
+type:"sword",
+name:"Ichigo Sword",
+materials:["Soul Flame","Spiritual Core","Soul Fragment"],
+recipe:`5M Money<br>8,500 Gems<br>Soul Flame x2<br>Spiritual Core x4<br>Soul Fragment x8`
+},
+
+{
+type:"sword",
+name:"Shadow Sword",
+materials:["Atomic Core","Shadow Essence","Void Seed","Umbral Capsule"],
+recipe:`10M Money<br>15,000 Gems<br>Atomic Core x1<br>Shadow Essence x4<br>Void Seed x8<br>Umbral Capsule x20`
+},
+
+{
+type:"sword",
+name:"Shadow Monarch",
+materials:["Monarch Core","Monarch Essence","Kamish Dagger","Shadow Crystal"],
+recipe:`King of Shadows Title<br>Jinwoo Sword<br>Monarch Core x10<br>Monarch Essence x5<br>Kamish Dagger x2<br>Shadow Crystal x1`
+},
+
+{
+type:"sword",
+name:"Atomic",
+materials:["Atomic Omen","Eminence Essence","Shadow Remnant","Magic Shard","Abyss Sigil"],
+recipe:`Eminence Incarnate Title<br>Shadow Sword<br>45,000 Gems<br>Atomic Omen x1<br>Eminence Essence x3<br>Shadow Remnant x9<br>Magic Shard x16<br>Abyss Sigil x80`
+},
+
+{
+type:"sword",
+name:"Ice Queen",
+materials:["Ice Core","Frozen Band","Glacier Remnant","Battle Shard","Frost Relic"],
+recipe:`Frost Empress Title<br>40,000 Gems<br>Ice Core x1<br>Frozen Band x4<br>Glacier Remnant x9<br>Battle Shard x17<br>Frost Relic x25`
+},
+
+{
+type:"style",
 name:"Gojo",
 materials:["Void Fragment","Limitless Ring","Infinity Core"],
-recipe:`Void Fragment x6<br>Limitless Ring x3<br>Infinity Core x1`
+recipe:`750,000 Money<br>4,000 Gems<br>Void Fragment x6<br>Limitless Ring x3<br>Infinity Core x1`
 },
+
 {
+type:"style",
 name:"Sukuna",
 materials:["Cursed Finger","Dismantle Fang","Crimson Heart"],
-recipe:`Cursed Finger x6<br>Dismantle Fang x3<br>Crimson Heart x1`
+recipe:`1,250,000 Money<br>5,000 Gems<br>Cursed Finger x6<br>Dismantle Fang x3<br>Crimson Heart x1`
 },
+
 {
+type:"style",
+name:"Qin Shi",
+materials:["Jade Tablet","Imperial Seal"],
+recipe:`500,000 Money<br>2,500 Gems<br>Jade Tablet x7<br>Imperial Seal x3`
+},
+
+{
+type:"style",
 name:"Yuji",
 materials:["Energy Core","Flash Impact","Divergent Pulse"],
 recipe:`Energy Core x7<br>Flash Impact x3<br>Divergent Pulse x1`
 },
+
 {
+type:"style",
 name:"Alucard",
 materials:["Soul Amulet","Casull","Blood Ring"],
-recipe:`Soul Amulet x5<br>Casull x1<br>Blood Ring x1`
+recipe:`6,500,000 Money<br>10,000 Gems<br>Soul Amulet x5<br>Casull x1<br>Blood Ring x1`
 },
+
 {
+type:"style",
+name:"Strongest of Today",
+materials:["Reversal Pulse","Blue Singularity","Infinity Essence"],
+recipe:`Six Eyes x6<br>Reversal Pulse x9<br>Blue Singularity x3<br>Infinity Essence x1`
+},
+
+{
+type:"style",
+name:"Strongest in History",
+materials:["Vessel Ring","Malevolent Soul","Cursed Flesh"],
+recipe:`Awakened Cursed Finger x20<br>Vessel Ring x7<br>Malevolent Soul x3<br>Cursed Flesh x1`
+},
+
+{
+type:"style",
+name:"Madoka",
+materials:["Heart","Divine Fragment","Sacred Bow","Radiant Core","Pink Gems"],
+recipe:`20,000,000 Money<br>15,000 Gems<br>Heart x100<br>Divine Fragment x8<br>Sacred Bow x5<br>Radiant Core x3<br>Pink Gems x1`
+},
+
+{
+type:"style",
 name:"Gilgamesh",
 materials:["Throne Remnant","Ancient Shard","Golden Essence","Phantasm Core"],
-recipe:`Throne Remnant x12<br>Ancient Shard x6<br>Golden Essence x3<br>Phantasm Core x1`
+recipe:`25,000,000 Money<br>22,500 Gems<br>Throne Remnant x12<br>Ancient Shard x6<br>Golden Essence x3<br>Phantasm Core x1`
 },
+
 {
-name:"Madoka",
-materials:["Heart","Divine Fragment","Sacred Bow","Radiant Core"],
-recipe:`Heart x100<br>Divine Fragment x8<br>Sacred Bow x5<br>Radiant Core x3`
+type:"style",
+name:"Anos",
+materials:["Calamity Seal","Demonic Fragment","Demonic Shard","Destruction Eye","Imperial Mark"],
+recipe:`Calamity Seal x65<br>Demonic Fragment x12<br>Demonic Shard x6<br>Destruction Eye x2<br>Imperial Mark x1`
 },
+
 {
-name:"Strongest Shinobi",
-materials:["Path Fragment","Eternal Core","Battle Sigil","Power Remnant"],
-recipe:`Path Fragment x1<br>Eternal Core x3<br>Battle Sigil x8<br>Power Remnant x15`
+type:"style",
+name:"Blessed Maiden",
+materials:["Celestial Mark","Aero Core","Gale Essence","Tide Remnant","Tempest Relic"],
+recipe:`Celestial Mark x1<br>Aero Core x3<br>Gale Essence x8<br>Tide Remnant x14<br>Tempest Relic x25<br>32,500 Gems`
 },
+
 {
-name:"Moon Slayer",
-materials:["Moon Crest","Crescent Shard","Lunar Essence","Demon Remnant"],
-recipe:`Moon Crest x1<br>Crescent Shard x4<br>Lunar Essence x9<br>Demon Remnant x16`
+type:"style",
+name:"Saber Alter",
+materials:["Dark Grail","Morgan Remnant","Alter Essence","Corruption Core","Corrupt Crown"],
+recipe:`Dark Grail x25<br>Morgan Remnant x15<br>Alter Essence x8<br>Corruption Core x3<br>Corrupt Crown x1`
 }
+
 ];
 
-let index = 0;
+const swordList = document.getElementById("swordList");
+const styleList = document.getElementById("styleList");
+const display = document.getElementById("display");
 
-function render(){
-    const val = document.getElementById("search").value.toLowerCase();
-    const grid = document.getElementById("grid");
-    grid.innerHTML = "";
+function renderLists(){
+    swordList.innerHTML = "";
+    styleList.innerHTML = "";
 
-    const filter = item => item.materials.some(m => m.toLowerCase().includes(val));
+    database.forEach(item=>{
+        const div = document.createElement("div");
+        div.className = "item";
+        div.textContent = item.name;
+        div.onclick = ()=>show(item);
 
-    let s = val ? swords.filter(filter) : swords;
-    let m = val ? melee.filter(filter) : melee;
-
-    s.slice(index,index+2).forEach(i=>{
-        grid.innerHTML += `<div class="card"><h3>⚔️ ${i.name}</h3>${i.recipe}</div>`;
-    });
-
-    m.slice(index,index+2).forEach(i=>{
-        grid.innerHTML += `<div class="card"><h3>👊 ${i.name}</h3>${i.recipe}</div>`;
+        if(item.type==="sword"){
+            swordList.appendChild(div);
+        } else {
+            styleList.appendChild(div);
+        }
     });
 }
 
-function move(d){
-    index += d;
-    if(index < 0) index = 0;
-    if(index > 3) index = 3;
-    render();
+function show(item){
+    display.innerHTML = `<h3>${item.name}</h3>${item.recipe}`;
 }
 
-document.getElementById("search").addEventListener("input", ()=>{
-    index=0;
-    render();
+document.getElementById("search").addEventListener("input", e=>{
+    const val = e.target.value.toLowerCase();
+
+    const results = database.filter(item =>
+        item.materials.some(m => m.toLowerCase().includes(val))
+    );
+
+    if(val===""){
+        display.innerHTML = "Selecciona un arma o busca un material";
+        return;
+    }
+
+    display.innerHTML = results.map(r =>
+        `<h3>${r.name}</h3>${r.recipe}<hr>`
+    ).join("");
 });
 
-render();
+renderLists();
 
 </script>
 
