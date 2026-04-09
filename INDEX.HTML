@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sailor Piece Finder</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: white;
+    padding: 15px;
+}
+
+h1 {
+    text-align: center;
+    color: #38bdf8;
+    text-shadow: 0 0 10px #38bdf8;
+}
+
+.search {
+    text-align: center;
+    margin: 15px 0;
+}
+
+input {
+    width: 90%;
+    max-width: 400px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #1e293b;
+    color: white;
+    box-shadow: 0 0 10px #38bdf8;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.card {
+    background: #020617;
+    border: 1px solid #38bdf8;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 0 10px #0ea5e9;
+}
+
+.card h3 {
+    margin: 0 0 5px;
+    color: #22c55e;
+}
+
+.buttons {
+    text-align: center;
+    margin: 15px 0;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    background: #1e293b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}
+
+button:hover {
+    background: #38bdf8;
+}
+</style>
+</head>
+
+<body>
+
+<h1>⚔️ Sailor Piece Finder</h1>
+
+<div class="search">
+<input type="text" id="search" placeholder="🔎 Buscar material...">
+</div>
+
+<div class="buttons">
+<button onclick="move(-1)">⬅️</button>
+<button onclick="move(1)">➡️</button>
+</div>
+
+<div class="container" id="grid"></div>
+
+<script>
+
+const swords = [
+{
+name:"Ice Queen",
+materials:["Ice Core","Frozen Band","Glacier Remnant","Battle Shard","Frost Relic"],
+recipe:`Ice Core x1<br>Frozen Band x4<br>Glacier Remnant x9<br>Battle Shard x17<br>Frost Relic x25`
+},
+{
+name:"Shadow Monarch",
+materials:["Monarch Core","Monarch Essence","Kamish Dagger","Shadow Crystal"],
+recipe:`Monarch Core x10<br>Monarch Essence x5<br>Kamish Dagger x2<br>Shadow Crystal x1`
+},
+{
+name:"Atomic",
+materials:["Atomic Omen","Eminence Essence","Shadow Remnant","Magic Shard","Abyss Sigil"],
+recipe:`Atomic Omen x1<br>Eminence Essence x3<br>Shadow Remnant x9<br>Magic Shard x16<br>Abyss Sigil x80`
+},
+{
+name:"True Aizen",
+materials:["Evolution Fragment","Transcendent Core","Divinity Essence","Fusion Ring","Chrysalis Sigil"],
+recipe:`Evolution Fragment x1<br>Transcendent Core x3<br>Divinity Essence x8<br>Fusion Ring x15<br>Chrysalis Sigil x75`
+},
+{
+name:"Yamato",
+materials:["Azure Heart","Silent Storms","Yamato Essence","Frozen Will"],
+recipe:`Azure Heart x1<br>Silent Storms x3<br>Yamato Essence x7<br>Frozen Will x14`
+},
+{
+name:"Abyssal Empress",
+materials:["Tower Tokens"],
+recipe:`Tower Tokens x4000`
+}
+];
+
+const melee = [
+{
+name:"Gojo",
+materials:["Void Fragment","Limitless Ring","Infinity Core"],
+recipe:`Void Fragment x6<br>Limitless Ring x3<br>Infinity Core x1`
+},
+{
+name:"Sukuna",
+materials:["Cursed Finger","Dismantle Fang","Crimson Heart"],
+recipe:`Cursed Finger x6<br>Dismantle Fang x3<br>Crimson Heart x1`
+},
+{
+name:"Yuji",
+materials:["Energy Core","Flash Impact","Divergent Pulse"],
+recipe:`Energy Core x7<br>Flash Impact x3<br>Divergent Pulse x1`
+},
+{
+name:"Alucard",
+materials:["Soul Amulet","Casull","Blood Ring"],
+recipe:`Soul Amulet x5<br>Casull x1<br>Blood Ring x1`
+},
+{
+name:"Gilgamesh",
+materials:["Throne Remnant","Ancient Shard","Golden Essence","Phantasm Core"],
+recipe:`Throne Remnant x12<br>Ancient Shard x6<br>Golden Essence x3<br>Phantasm Core x1`
+},
+{
+name:"Madoka",
+materials:["Heart","Divine Fragment","Sacred Bow","Radiant Core"],
+recipe:`Heart x100<br>Divine Fragment x8<br>Sacred Bow x5<br>Radiant Core x3`
+},
+{
+name:"Strongest Shinobi",
+materials:["Path Fragment","Eternal Core","Battle Sigil","Power Remnant"],
+recipe:`Path Fragment x1<br>Eternal Core x3<br>Battle Sigil x8<br>Power Remnant x15`
+},
+{
+name:"Moon Slayer",
+materials:["Moon Crest","Crescent Shard","Lunar Essence","Demon Remnant"],
+recipe:`Moon Crest x1<br>Crescent Shard x4<br>Lunar Essence x9<br>Demon Remnant x16`
+}
+];
+
+let index = 0;
+
+function render(){
+    const val = document.getElementById("search").value.toLowerCase();
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    const filter = item => item.materials.some(m => m.toLowerCase().includes(val));
+
+    let s = val ? swords.filter(filter) : swords;
+    let m = val ? melee.filter(filter) : melee;
+
+    s.slice(index,index+2).forEach(i=>{
+        grid.innerHTML += `<div class="card"><h3>⚔️ ${i.name}</h3>${i.recipe}</div>`;
+    });
+
+    m.slice(index,index+2).forEach(i=>{
+        grid.innerHTML += `<div class="card"><h3>👊 ${i.name}</h3>${i.recipe}</div>`;
+    });
+}
+
+function move(d){
+    index += d;
+    if(index < 0) index = 0;
+    if(index > 3) index = 3;
+    render();
+}
+
+document.getElementById("search").addEventListener("input", ()=>{
+    index=0;
+    render();
+});
+
+render();
+
+</script>
+
+</body>
+</html>
