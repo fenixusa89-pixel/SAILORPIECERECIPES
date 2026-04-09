@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sailor Piece App</title>
+<title>Sailor Piece Mobile</title>
 
 <style>
 body {
@@ -11,49 +11,69 @@ body {
     font-family: Arial;
     background: #020617;
     color: white;
-    display: flex;
-    height: 100vh;
 }
 
-.sidebar {
-    width: 30%;
+/* HEADER */
+.header {
+    padding: 15px;
+    text-align: center;
+    font-size: 20px;
     background: #0f172a;
-    padding: 10px;
-    overflow-y: auto;
-}
-
-.main {
-    flex: 1;
-    padding: 20px;
-}
-
-h2 {
     color: #38bdf8;
 }
 
-.item {
-    padding: 8px;
-    margin: 5px 0;
+/* BUSCADOR */
+.search-box {
+    padding: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #1e293b;
+    color: white;
+    font-size: 16px;
+}
+
+/* BOTONES */
+.tabs {
+    display: flex;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
     background: #020617;
-    border-radius: 6px;
+    border-bottom: 2px solid transparent;
     cursor: pointer;
 }
 
-.item:hover {
-    background: #38bdf8;
+.tab.active {
+    border-bottom: 2px solid #38bdf8;
 }
 
-.search {
-    width: 100%;
+/* LISTA */
+.list {
     padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: none;
 }
 
-.card {
-    background: #0f172a;
+.item {
     padding: 15px;
+    margin: 8px 0;
+    background: #0f172a;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* CARD CENTRAL */
+.card {
+    margin: 10px;
+    padding: 15px;
+    background: #0f172a;
     border-radius: 10px;
     box-shadow: 0 0 10px #38bdf8;
 }
@@ -62,24 +82,26 @@ h2 {
 
 <body>
 
-<div class="sidebar">
+<div class="header">⚔️ Sailor Piece</div>
 
-<input class="search" id="search" placeholder="Buscar material...">
-
-<h2>⚔️ Espadas</h2>
-<div id="swordList"></div>
-
-<h2>👊 Estilos</h2>
-<div id="styleList"></div>
-
+<div class="search-box">
+<input type="text" id="search" placeholder="Buscar material...">
 </div>
 
-<div class="main">
-<h2>📜 Receta</h2>
-<div id="display" class="card">Selecciona un arma o busca un material</div>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('sword')">⚔️ Espadas</div>
+<div class="tab" onclick="switchTab('style')">👊 Estilos</div>
+</div>
+
+<div id="list" class="list"></div>
+
+<div id="display" class="card">
+Selecciona un arma o busca un material
 </div>
 
 <script>
+
+let currentTab = "sword";
 
 const database = [
 
@@ -239,50 +261,54 @@ recipe:`Dark Grail x25<br>Morgan Remnant x15<br>Alter Essence x8<br>Corruption C
 
 ];
 
-const swordList = document.getElementById("swordList");
-const styleList = document.getElementById("styleList");
-const display = document.getElementById("display");
+function renderList(){
+    const list = document.getElementById("list");
+    list.innerHTML = "";
 
-function renderLists(){
-    swordList.innerHTML = "";
-    styleList.innerHTML = "";
-
-    database.forEach(item=>{
+    database
+    .filter(item => item.type === currentTab)
+    .forEach(item => {
         const div = document.createElement("div");
         div.className = "item";
         div.textContent = item.name;
-        div.onclick = ()=>show(item);
-
-        if(item.type==="sword"){
-            swordList.appendChild(div);
-        } else {
-            styleList.appendChild(div);
-        }
+        div.onclick = () => show(item);
+        list.appendChild(div);
     });
 }
 
 function show(item){
-    display.innerHTML = `<h3>${item.name}</h3>${item.recipe}`;
+    document.getElementById("display").innerHTML =
+        `<h3>${item.name}</h3>${item.recipe}`;
+}
+
+function switchTab(tab){
+    currentTab = tab;
+
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    event.target.classList.add("active");
+
+    renderList();
 }
 
 document.getElementById("search").addEventListener("input", e=>{
     const val = e.target.value.toLowerCase();
 
+    if(val === ""){
+        renderList();
+        document.getElementById("display").innerHTML =
+            "Selecciona un arma o busca un material";
+        return;
+    }
+
     const results = database.filter(item =>
         item.materials.some(m => m.toLowerCase().includes(val))
     );
 
-    if(val===""){
-        display.innerHTML = "Selecciona un arma o busca un material";
-        return;
-    }
-
-    display.innerHTML = results.map(r =>
-        `<h3>${r.name}</h3>${r.recipe}<hr>`
-    ).join("");
+    document.getElementById("display").innerHTML =
+        results.map(r => `<h3>${r.name}</h3>${r.recipe}<hr>`).join("");
 });
 
-renderLists();
+renderList();
 
 </script>
 
